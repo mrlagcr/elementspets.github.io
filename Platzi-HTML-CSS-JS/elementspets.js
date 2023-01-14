@@ -15,10 +15,10 @@ const sectionMensajes = document.getElementById("resultado")
 const ataquesDelJugador = document.getElementById("ataques-del-jugador")
 const ataquesDelEnemigo = document.getElementById("ataques-del-enemigo")
 const contenedorTarjetas = document.getElementById("contenedor-tarjetas")
-const contenedorAtaques = document.getElementById("contenedor-ataques")
+const contenedorAtaques = document.getElementById("contenedorAtaques")
 
 let pets = []
-let ataqueJugador 
+let ataqueJugador = []
 let ataqueEnemigo
 let vidasJugador = 3
 let vidasEnemigo = 3
@@ -31,6 +31,8 @@ let ataquesPets
 let botonFuego
 let botonAgua
 let botonPlanta 
+let botones = []
+
 
 class Pets{
      constructor (nombre, foto, vida){
@@ -46,26 +48,26 @@ let origato = new Pets("Origato", "./assets/Origato.jpg", 5)
 let pezcuito = new Pets("Pezcuito", "./assets/pezcuito.jpg", 5)
 
 serpinto.ataques.push(
-     {nombre: "Fuego 🔥", id: "boton-fuego"},
-     {nombre: "Fuego 🔥", id: "boton-fuego"},
-     {nombre: "Fuego 🔥", id: "boton-fuego"},
-     {nombre: "Agua 🌊", id: "boton-agua"},
-     {nombre: "Planta 🌱", id: "boton-planta"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Planta ", id: "boton-Planta"},
 
 ) 
 origato.ataques.push(
-     {nombre: "Planta 🌱", id: "boton-planta"},
-     {nombre: "Planta 🌱", id: "boton-planta"},
-     {nombre: "Planta 🌱", id: "boton-planta"},
-     {nombre: "Fuego 🔥", id: "boton-fuego"},
-     {nombre: "Agua 🌊", id: "boton-agua"}, 
+     {nombre: "Planta ", id: "boton-Planta"},
+     {nombre: "Planta ", id: "boton-Planta"},
+     {nombre: "Planta ", id: "boton-Planta"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Agua ", id: "boton-Agua"}, 
 )
 pezcuito.ataques.push(
-     {nombre: "Agua 🌊", id: "boton-agua"},
-     {nombre: "Agua 🌊", id: "boton-agua"},
-     {nombre: "Agua 🌊", id: "boton-agua"},
-     {nombre: "Fuego 🔥", id: "boton-fuego"},
-     {nombre: "Planta 🌱", id: "boton-planta"},
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Planta ", id: "boton-Planta"},
 )
 
 pets.push(serpinto, origato, pezcuito)
@@ -85,7 +87,7 @@ function iniciarJuego(){
               <img src=${pets.foto} alt=${pets.nombre}
           </label>
           `
-     contenedorTarjetas.innerHTML += opcionDePets
+     contenedorTarjetas.innerHTML += opcionDePets;
 
      inputSerpinto = document.getElementById("Serpinto")
      inputOrigato = document.getElementById("Origato")
@@ -111,7 +113,7 @@ function seleccionatMascotaJugador(){
         spanMascotaJugador.innerHTML = inputPezcuito.id
         mascotaJugador = inputPezcuito.id
    } else {
-        alert("Selecciona una Mascota")
+        alert("Selecciona una Mascota");
    }
    extraerAtaques(mascotaJugador);
    seleccionatMascotaEnemigo();
@@ -123,41 +125,50 @@ function extraerAtaques(mascotaJugador){
                ataques = pets[contador].ataques;
           }
      }
-     mostrarAtaques(ataques);
+     mostrarAtaques(ataques)
 }
 
 function mostrarAtaques(ataques){
      ataques.forEach((ataque)=>{
-          ataquesPets = `<button id = ${ataque.id} class="boton-de-ataque"> ${ataque.nombre} </button>`
-          contenedorAtaques.innerHTML += ataquesPets
+          ataquesPets = `<button id = ${ataque.id} class= "boton-de-ataque BAtaque"> ${ataque.nombre} </button>`
+          contenedorAtaques.innerHTML += ataquesPets;
      })
 
-      botonFuego = document.getElementById("boton-fuego")
-      botonAgua = document.getElementById("boton-agua")
-      botonPlanta = document.getElementById("boton-planta")
-      botonFuego.addEventListener("click", ataqueFuego)
-      botonAgua.addEventListener("click", ataqueAgua)
-      botonPlanta.addEventListener("click", ataquePlanta)
+     botonFuego = document.getElementById("boton-Fuego");
+     botonAgua = document.getElementById("boton-Agua");
+     botonPlanta = document.getElementById("boton-Planta");
+     botones = document.querySelectorAll(".BAtaque");
+      
 }
 
+function secuenciaAtaque(){
+     botones.forEach((boton)=>{
+          boton.addEventListener("click", (seleccion) => {
+                if(seleccion.target.textContent === " Fuego  "){
+                         ataqueJugador.push("Fuego") ;
+                         console.log(ataqueJugador);
+                         boton.style.background = "#112f58";
+                } else if(seleccion.target.textContent === " Planta  "){
+                         ataqueJugador.push("Planta");
+                         console.log(ataqueJugador);
+                         boton.style.background = "#112f58";
+                } else {
+                         ataqueJugador.push("Agua");
+                         console.log(ataqueJugador);
+                         boton.style.background = "#112f58";
+                    }
+                console.log(seleccion);
+                
+          })
+     })
+}
 function seleccionatMascotaEnemigo(){
      let mascotaEnemigaAleatoria = aleatorio(0, pets.length -1)
      
      spanMascotaEnemigo.innerHTML = pets[mascotaEnemigaAleatoria].nombre
+     secuenciaAtaque();
 }
 
-function ataqueFuego(){
-     ataqueJugador = "Fuego"
-     ataqueAleatorioEnemigo ()
-}
-function ataquePlanta(){
-     ataqueJugador = "Planta"
-     ataqueAleatorioEnemigo ()
-}
-function ataqueAgua(){
-     ataqueJugador = "Agua"
-     ataqueAleatorioEnemigo ()
-} 
 function ataqueAleatorioEnemigo(){
      ataqueAleatorio = aleatorio(1,3)
      
