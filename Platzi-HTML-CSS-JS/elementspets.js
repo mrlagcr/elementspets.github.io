@@ -20,6 +20,8 @@ const contenedorAtaques = document.getElementById("contenedorAtaques")
 const sectionVerMapa = document.getElementById("ver-mapa")
 const mapa = document.getElementById("mapa")
 
+
+
 let pets = []
 let ataqueJugador = []
 let ataqueEnemigo = []
@@ -30,6 +32,7 @@ let inputSerpinto
 let inputOrigato 
 let inputPezcuito 
 let mascotaJugador
+let mascotaJugadorObjeto
 let ataquesPets
 let botonFuego
 let botonAgua
@@ -41,22 +44,65 @@ let posicionAtaqueEnemigo
 let victoriasJugador = 0
 let victoriasEnemigo = 0
 let lienzo = mapa.getContext("2d")
+let intervalo
+let mapaBackground = new Image()
+mapaBackground.src = "./assets/Petsmap.png"
+let alturaResponsiva
+let anchoDelMapa = window.innerWidth - 20
 
+alturaResponsiva = anchoDelMapa * 600 / 800
+
+mapa.width = anchoDelMapa
+mapa.height = alturaResponsiva
+const anchoMaximoDelMapa = 350
+     if(anchoDelMapa > anchoMaximoDelMapa){
+          anchoDelMapa = anchoMaximoDelMapa - 20
+     }
 
 class Pets{
-     constructor (nombre, foto, vida){
+     constructor (nombre, foto, vida, fotoMapa){
           this.nombre = nombre
           this.foto = foto
           this.vida = vida
           this.ataques = []
+          this.ancho = 80
+          this.alto = 80
+          this.x = aleatorio(0, mapa.width - this.ancho)
+          this.y = aleatorio(0, mapa.height - this.alto)
+          this.mapaFoto = new Image()
+          this.mapaFoto.src = fotoMapa
+          this. velocidadX = 0
+          this. velocidadY = 0
+     }
+
+     pintarPet(){
+          lienzo.drawImage(
+               this.mapaFoto,
+               this.x,
+               this.y,
+               this.ancho,
+               this.alto,
+              )
      }
 }
 
-let serpinto = new Pets("Serpinto", "./assets/Serpinto.jpg", 5)
-let origato = new Pets("Origato", "./assets/Origato.jpg", 5)
-let pezcuito = new Pets("Pezcuito", "./assets/pezcuito.jpg", 5)
+let serpinto = new Pets("Serpinto", "./assets/Serpinto.jpg", 5, "./assets/Serpinto.jpg" )
+let origato = new Pets("Origato", "./assets/Origato.jpg", 5, "./assets/Origato.jpg")
+let pezcuito = new Pets("Pezcuito", "./assets/pezcuito.jpg", 5, "./assets/pezcuito.jpg")
+
+let serpintoEnemigo = new Pets("Serpinto", "./assets/Serpinto.jpg", 5, "./assets/arbusto-removebg-preview.png")
+let origatoEnemigo = new Pets("Origato", "./assets/Origato.jpg", 5, "./assets/arbusto-removebg-preview.png")
+let pezcuitoEnemigo = new Pets("Pezcuito", "./assets/pezcuito.jpg", 5, "./assets/arbusto-removebg-preview.png")
 
 serpinto.ataques.push(
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Planta ", id: "boton-Planta"},
+
+) 
+serpintoEnemigo.ataques.push(
      {nombre: "Fuego ", id: "boton-Fuego"},
      {nombre: "Fuego ", id: "boton-Fuego"},
      {nombre: "Fuego ", id: "boton-Fuego"},
@@ -71,7 +117,21 @@ origato.ataques.push(
      {nombre: "Fuego ", id: "boton-Fuego"},
      {nombre: "Agua ", id: "boton-Agua"}, 
 )
+origatoEnemigo.ataques.push(
+     {nombre: "Planta ", id: "boton-Planta"},
+     {nombre: "Planta ", id: "boton-Planta"},
+     {nombre: "Planta ", id: "boton-Planta"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Agua ", id: "boton-Agua"}, 
+)
 pezcuito.ataques.push(
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Agua ", id: "boton-Agua"},
+     {nombre: "Fuego ", id: "boton-Fuego"},
+     {nombre: "Planta ", id: "boton-Planta"},
+)
+pezcuitoEnemigo.ataques.push(
      {nombre: "Agua ", id: "boton-Agua"},
      {nombre: "Agua ", id: "boton-Agua"},
      {nombre: "Agua ", id: "boton-Agua"},
@@ -113,17 +173,8 @@ function iniciarJuego(){
 function seleccionatMascotaJugador(){
    
     sectionSeleccionarMascota.style.display = "none"
-    //sectionSeleccionarAtaque.style.display = "flex"
-    sectionVerMapa.style.display = "flex"
-    let imagenDeSerpinto = new Image()
-    imagenDeSerpinto.src = serpinto.foto
-    lienzo.drawImage(
-     imagenDeSerpinto,
-     20,
-     40,
-     100,
-     100,
-    )
+
+    
 
     if(inputSerpinto.checked){
         spanMascotaJugador.innerHTML = inputSerpinto.id
@@ -138,7 +189,9 @@ function seleccionatMascotaJugador(){
         alert("Selecciona una Mascota");
    }
    extraerAtaques(mascotaJugador);
-   seleccionatMascotaEnemigo();
+   sectionVerMapa.style.display = "flex"
+     iniciarMapa();
+   
 }
 function extraerAtaques(mascotaJugador){
      let ataques
@@ -294,6 +347,116 @@ function reiniciarJuego(){
 
 function aleatorio(min, max){
      return Math.floor(Math.random()*(max - min + 1) + min)
+}
+
+function pintarCanvas(){
+
+     mascotaJugadorObjeto.x = mascotaJugadorObjeto.x + mascotaJugadorObjeto.velocidadX
+     mascotaJugadorObjeto.y = mascotaJugadorObjeto.y + mascotaJugadorObjeto.velocidadY
+     lienzo.clearRect(0,0, mapa.width, mapa.height)
+     lienzo.drawImage(
+          mapaBackground,
+          0,
+          0,
+          mapa.width,
+          mapa.height
+
+     )
+     mascotaJugadorObjeto.pintarPet()
+     serpintoEnemigo.pintarPet()
+     origatoEnemigo.pintarPet()
+     pezcuitoEnemigo.pintarPet()
+     if(mascotaJugadorObjeto.velocidadX !== 0 || mascotaJugadorObjeto.velocidadY !== 0){
+          revisarColision(serpintoEnemigo)
+          revisarColision(origatoEnemigo)
+          revisarColision(pezcuitoEnemigo)
+     }
+}
+
+function moverDerecha (){
+     mascotaJugadorObjeto.velocidadX = 5
+}
+
+function moverIzquierda (){
+     mascotaJugadorObjeto.velocidadX = -5
+     
+}
+
+function moverAbajo (){
+     mascotaJugadorObjeto.velocidadY = 5
+     
+}
+
+function moverArriba (){
+     mascotaJugadorObjeto.velocidadY = -5
+     pintarCanvas()
+}
+function detenerMovimiento(){
+     
+     mascotaJugadorObjeto.velocidadX = 0
+     mascotaJugadorObjeto.velocidadY = 0 
+}
+
+function sePresionoTecla(event){
+     switch (event.key){
+          case "ArrowUp":
+               moverArriba()
+               break;
+          case "ArrowDown":
+               moverAbajo()
+               break;
+          case "ArrowRight":
+               moverDerecha()
+               break;
+          case "ArrowLeft":
+               moverIzquierda()
+               break;
+          default:
+               break;
+     }
+}
+
+function iniciarMapa(){
+
+     
+     mascotaJugadorObjeto = obtenerObjetoMascota(mascotaJugador)
+     console.log(mascotaJugadorObjeto, mascotaJugador)
+     intervalo = setInterval(pintarCanvas, 50)
+     window.addEventListener("keydown", sePresionoTecla)
+     window.addEventListener("keyup", detenerMovimiento)
+}
+
+function obtenerObjetoMascota (){
+     for ( let contador = 0; contador < pets.length; contador++ ){
+          if(mascotaJugador === pets[contador].nombre){
+               return pets[contador]
+          }
+     }
+}
+
+function revisarColision (enemigo){
+     const arribaEnemigo = enemigo.y
+     const abajoEnemigo = enemigo.y + enemigo.alto
+     const derechaEnemigo = enemigo.x + enemigo.ancho
+     const izquierdaEnemigo = enemigo.x
+
+     const arribaMascota = mascotaJugadorObjeto.y
+     const abajoMascota = mascotaJugadorObjeto.y + mascotaJugadorObjeto.alto
+     const derechaMascota = mascotaJugadorObjeto.x + mascotaJugadorObjeto.ancho
+     const izquierdaMascota = mascotaJugadorObjeto.x
+
+     if(
+          abajoMascota < arribaEnemigo || arribaMascota > abajoEnemigo || derechaMascota < izquierdaEnemigo || izquierdaMascota > derechaEnemigo
+     ){
+          return;
+     }
+
+     detenerMovimiento()
+     clearInterval(intervalo)
+     sectionSeleccionarAtaque.style.display = "flex"
+     sectionVerMapa.style.display = "none"
+     seleccionatMascotaEnemigo(enemigo)
+     //alert("Hay Enfrentamiento con " + enemigo.nombre)
 }
 
 window.addEventListener("load", iniciarJuego)
